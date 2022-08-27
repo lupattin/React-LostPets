@@ -1,0 +1,17 @@
+
+.petsPage_card_title{
+    font-size: 50px;
+}
+
+@media (max-width: 600px) {
+    .petsPage_container {
+        flex-direction: column-reverse;
+        align-items: center;
+      }
+    .petsPage_card_container {
+      display: none;
+    }
+    .petsPage_card_title{
+        font-size: 30px;
+    }
+  }
