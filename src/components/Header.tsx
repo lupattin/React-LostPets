@@ -20,6 +20,9 @@ function Header() {
   /* Create this functions because the href reload the entire page so I use de onClick to change de path */
   function clickToHome() {
     localStorage.removeItem("data")
+    localStorage.removeItem("userPets")
+    localStorage.removeItem("coords")
+    localStorage.removeItem("recoil-persist")
     navigate("/", { replace: true });
   }
   function SignUP() {

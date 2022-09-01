@@ -4,7 +4,7 @@ import { MyDropzone } from "../ui/DropZone";
 import { MapBoxSearchLocation } from "./Mapbox";
 import { ButtonCheck, ButtonSubmit } from "../ui/Button";
 import { fetchCheckDirection, fetchReportNewPet, fetchPetsByUser } from "../lib/fetch";
-import { userState, petURLImage, checkUbication, petsFound } from "../atoms";
+import { userState, petURLImage, checkUbication, petsFound, trigger } from "../atoms";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { AlertCorrectModifed, AlertSignInError } from "../ui/Alerts";
 
@@ -19,6 +19,7 @@ function ReportPet() {
   const image = useRecoilValue(petURLImage)
   const setCheckNewUbication = useSetRecoilState(checkUbication)
   const setPetsFound = useSetRecoilState(petsFound)
+  const setTrigger = useSetRecoilState(trigger)
   
   
   async function handleCheckDirection() {
@@ -47,7 +48,9 @@ function ReportPet() {
       setPetsFound(resultsPets)
       setInterval(()=>{
         setAlert(false)
-      },4000)
+        setTrigger("cambio")
+        location.reload()
+      },3000)
     }else{
       setAlertError(true)
       setInterval(()=>{

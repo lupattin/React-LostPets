@@ -96,6 +96,7 @@ function FormSignUp() {
           setUserData({token:res.token, user: res.user})
           setUserName({name:res.user.name})
           setOffcanvasSignUpState(false)
+          localStorage.setItem("data", JSON.stringify(res))
         }       
     })
   }
@@ -134,18 +135,30 @@ function FormChangePetData({name,direction, level, city, petId}) {
   const [showAlert, setShowAlert] = useState(false)
   const [showDeleteAlert, setShowDeleteAlert] = useState(false)
   const [showDeleteErrorAlert, setShowDeleteErrorAlert] = useState(false)
+  const [showNoImageErrorAlert, setShowNoImageErrorAlert] = useState(false)
+  const setPetsFound = useSetRecoilState(petsFound)
 
   const userData = useRecoilValue(userState) as any
   const newPetURLimage = useRecoilValue(petURLImage)
 
- async function handleSubmit(e){
+  async function handleSubmit(e){
     e.preventDefault()
     
    const result = await fetchUpdatePetData(petId, e.target.direction.value, e.target.level.value, e.target.city.value, userData.token, e.target.name.value, userData.user.id, newPetURLimage)
-   if (result.statusText =="OK") {
+   
+   
+   if (result == "OK") {
     setShowAlert(true)
+    const results = await fetchPetsByUser(userData.user.id)
+    setPetsFound(results)
+    
     setTimeout(()=>{
       setShowAlert(false)
+    }, 5000)
+   }else if(result == "Error, No se Cargo ninguna imagen."){
+    setShowNoImageErrorAlert(true)
+    setTimeout(()=>{
+      setShowNoImageErrorAlert(false)
     }, 5000)
    }
   }
@@ -168,19 +181,19 @@ function FormChangePetData({name,direction, level, city, petId}) {
     <Form onSubmit={handleSubmit} style={{display:"flex", flexDirection:"column", alignItems:"center", marginBottom:"20px"}}>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Nombre</Form.Label>
-        <Form.Control type="text" placeholder={name} name="name" />
+        <Form.Control required type="text" placeholder={name} name="name" />
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Dirección</Form.Label>
-        <Form.Control type="text" placeholder={direction} name="direction"/>
+        <Form.Control required type="text" placeholder={direction} name="direction"/>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Altura</Form.Label>
-        <Form.Control type="number" placeholder={level} name="level"/>
+        <Form.Control required type="number" placeholder={level} name="level"/>
       </Form.Group>
       <Form.Group className="mb-3" controlId="formBasicEmail">
         <Form.Label>Ciudad</Form.Label>
-        <Form.Control type="text" placeholder={city} name="city"/>
+        <Form.Control required type="text" placeholder={city} name="city"/>
       </Form.Group>
       <Form.Label style={{ textAlign: "center", fontSize: "20px" }}>
           Nueva Imagen.
@@ -189,6 +202,7 @@ function FormChangePetData({name,direction, level, city, petId}) {
         <AlertCorrectModifed show={showAlert}>Modificado Correctamente</AlertCorrectModifed>
         <AlertCorrectModifed show={showDeleteAlert}>Mascota Eliminada Correctamente</AlertCorrectModifed>
         <AlertSignInError show={showDeleteErrorAlert}>Error, intentar mas tarde.</AlertSignInError>
+        <AlertSignInError show={showNoImageErrorAlert}>Error, no se cargo ninguna imagen.</AlertSignInError>
       <ButtonSubmit click={()=>{}}>
         Modificar
       </ButtonSubmit>

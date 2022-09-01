@@ -75,24 +75,27 @@ export async function fetchReportNewPet(name, street, level, city, lng, lat, use
 }
 
 export async function fetchUpdatePetData(key, direction,streetLevel,city, token, name, userId, image) {
-  const newCoords = await fetch("https://nominatim.openstreetmap.org/search?street=" +  streetLevel + " " +  direction +  "&city=" + city + "&format=json" )
-  const newCoordsJson = await newCoords.json()
-  
-  const result = await fetch(BASE_URL_API + "/pet", {method: "PATCH", headers: {"content-type": "application/json", authorization: "Bearer" + `"` + token + `"`},
-    body: JSON.stringify({
-      id:key,
-      name,
-      street:direction,
-      level:streetLevel,
-      city,
-      _geoloc: { lng:newCoordsJson[0].lon, lat:newCoordsJson[0].lat },
-      userId,
-      image,
-    }),
-  })
-  return result
-  
-  
+  if (image) {
+    const newCoords = await fetch("https://nominatim.openstreetmap.org/search?street=" +  streetLevel + " " +  direction +  "&city=" + city + "&format=json" )
+    const newCoordsJson = await newCoords.json()
+    
+    const result = await fetch(BASE_URL_API + "/pet", {method: "PATCH", headers: {"content-type": "application/json", authorization: "Bearer" + `"` + token + `"`},
+      body: JSON.stringify({
+        id:key,
+        name,
+        street:direction,
+        level:streetLevel,
+        city,
+        _geoloc: { lng:newCoordsJson[0].lon, lat:newCoordsJson[0].lat },
+        userId,
+        image,
+      }),
+    })
+    return result.statusText
+    
+  }else{
+    return "Error, No se Cargo ninguna imagen."
+  }
 }
 export async function fetchEliminatePet(petId, token) {
   const result = await fetch(BASE_URL_API + "/pet", {method: "DELETE", headers: {"content-type": "application/json", authorization: "Bearer" + `"` + token + `"`},
